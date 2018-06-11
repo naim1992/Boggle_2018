@@ -17,8 +17,7 @@ open Journal;;
 			in
 				nb_tour := int_of_string(Sys.argv.(4));
 				open_journal ();
-				
-				(new server_manager port nb_tour)#start()
+				(new server_maj port nb_tour)#start()
 		else
 			print_endline "usage : server -port port -tours nbtour";;
    

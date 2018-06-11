@@ -4,7 +4,7 @@ open Journal;;
 open Tour;;
 open Session;;
 
-class server_manager port n =
+class server_maj port n =
    object(self)
     inherit server port n
 		

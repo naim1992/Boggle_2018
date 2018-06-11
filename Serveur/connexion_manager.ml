@@ -2,6 +2,9 @@ open Connexion;;
 open Global_functions;;
 
 exception Fin ;;
+let mutex = Mutex.create ();;
+
+
 
 (* verifier la trajectoire *)
 let verif_traj traj = 
@@ -72,7 +75,6 @@ let scores list =
 
 
   (*transformer la matrice en  string pour l'envoyer*)
-(*
 let array_to_string tab = 
   let tab_string = ref "" in 
    for i = 0 to ((Array.length tab) -1)  do
@@ -81,7 +83,7 @@ let array_to_string tab =
     done
    done;
    !tab_string;;
-*)
+
 class connexion_maj sd sa b tour =
 object(self)
 inherit connexion sd sa b tour
@@ -89,7 +91,6 @@ inherit connexion sd sa b tour
     val score = ref 0
     val inchan = Unix.in_channel_of_descr sd
     val out_chan = Unix.out_channel_of_descr sd
-		val name = ref ""
 		
 		val tirage = tour#getTirage
 		val dictionnaire = tour#getDictionnaire
@@ -130,7 +131,6 @@ method signal_connexion client =
             end
           else
             begin
-							name := client;
 								if (List.length !clients > 0) then 
 									begin
                     let users = ref "USERS/" in 
@@ -146,9 +146,9 @@ method signal_connexion client =
 								Mutex.unlock mutex_session
 								end;
 								
-								Mutex.lock mutex_clients;
+								Mutex.lock mutex;
 								clients := !clients@[{user = client; socket = s_descr; motsproposes = ref ""; score = ref 0; outchan = out_chan}];
-                Mutex.unlock mutex_clients;
+                Mutex.unlock mutex;
 								
 								print_endline ("new Connexion from : " ^ client);
 								let scores = ref ((string_of_int (tour#getNumTour ())) ^ "*") in
@@ -158,10 +158,8 @@ method signal_connexion client =
 						
                 let message = "BIENVENUE/" ^ (array_to_string tour#getTirage) ^ "/" ^ !scores ^ "/\n" in
                         output_string out_chan message;
-                        flush out_chan;
-								let message = "TIME/" ^ (string_of_int !timer) ^ "\n" in
-									output_string out_chan message;
-                  flush out_chan
+                        flush out_chan
+              
             end 
 
     (* debut d'une session *)
@@ -241,29 +239,6 @@ method signal_connexion client =
 			let message = "RECEPTION/" ^ msg ^ "\n" in
 			List.map (fun x -> output_string x.outchan message;
         			flush x.outchan) !clients)
-						
-	method send_journal file = 
-		
-		if (file = "journal.html") then
-			begin
-				let message = ref "" in
-				message := "HTTP/1.1 200 OK\nContent-Type : text/html\n\n";
-				let content = read_file file in
-				ignore (List.map ( fun x -> message := !message ^ x ^ "\n" ) content);
-				print_endline !message;
-				output_string out_chan !message;
-				flush out_chan
-			end
-		else 
-			begin
-			
-				output_string out_chan "HTTP/1.1 404 not found \n\n";
-				flush out_chan
-			end;
-				
-        
- 
-					
 							
 	method send_message_to msg user = 
 		ignore(
@@ -296,8 +271,7 @@ method signal_connexion client =
 														
 
 				| "PENVOI" -> self#send_message_to (List.nth message 1) (List.nth message 2)
-				| "GET " -> let file = (List.nth (String.split_on_char ' ' (List.nth message 1)) 0) in
-				            self#send_journal file
+														
         | _ -> let message = "Commande Invalide\n" in
                 	output_string out_chan message;
             			flush out_chan
@@ -308,16 +282,11 @@ method signal_connexion client =
         while true do
         let ligne = input_line inchan
         in if (ligne = "") || (ligne = "\013") then raise Fin ;
-        
-				let message = String.split_on_char '/' (String.trim ligne) in
-				 (* print_endline (String.trim ligne); *)
+        let message = String.split_on_char '/' (String.trim ligne) in
           self#treat_request  message
         done
       with
       Fin -> ()
-      | exn -> print_string (Printexc.to_string exn);
-				 Thread.delay 0.005;
-				 self#deconnect !name;
-				 print_newline()
+      | exn -> print_string (Printexc.to_string exn) ; print_newline()
         
 end ;;

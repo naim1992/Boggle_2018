@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <title>BOGGLE</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</head>
+<body onload="loadXMLDoc()">
+     
+  <div class="jumbotron">
+    <h1>Boggle</h1> 
+    <p>Jeu de lettre multijoueurs développer par : Sofiane GHERSA et Naim CHOULLIT</p> 
+  </div>
+
+<br><br>
+<div class="container">
+  <table class="table table-striped table-hover table-bordered" id="demo" >
+
+  </table>
+</div>
+
+<script>
+function loadXMLDoc() {
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      myFunction(this);
+    }
+  };
+  xmlhttp.open("GET", "journal.xml", true);
+  xmlhttp.send();
+}
+function myFunction(xml) {
+  var i;
+  var xmlDoc = xml.responseXML;
+  
+  // recuperer tout le fichier 
+  var session = xmlDoc.getElementsByTagName("session");
+  var table="";
+  // var table="<tr><th>Artist</th><th>Title</th></tr>";
+
+  for (i = 0; i < session.length; i++) { 
+    table += "<tr class='bg-primary text-center'><td colspan='2'> Session numéro " + (i+1)
+    +" créé le : "+
+    session[i].getElementsByTagName("date")[0].childNodes[0].nodeValue +
+    "</td><tr>";
+
+      //  Parcour tout les tours
+      var tours = session[i].getElementsByTagName("tour");
+      for (let j = 0; j < tours.length; j++) {
+        table += "<tr class='bg-secondary text-center'><td colspan='2'> Tour numéro " + (j+1)
+        +"</td><tr>";
+          
+      //  Parcour tout les clients
+      table += "<tr class='text-center'><th>Joueur</th><th>Score</th></tr>";
+      var clients = tours[j].getElementsByTagName("client");
+          for (let k = 0; k < clients.length; k++) {
+           
+            table += "<tr class='text-center'><td>" +
+            clients[k].getElementsByTagName("name")[0].childNodes[0].nodeValue +
+            "</td><td>" +
+
+            clients[k].getElementsByTagName("score")[0].childNodes[0].nodeValue +
+            "</td></tr>";
+            
+          }
+        
+      }
+
+  }
+  
+  document.getElementById("demo").innerHTML = table;
+  
+}
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,12 @@
+<journal><session><date>10 mai 2018</date><tour><num_tour>1</num_tour><client><name>AA</name><score>1</score></client></tour><tour><num_tour>2</num_tour><client><name>AA</name><score>1</score></client><client><name>BB</name><score>0</score></client><client><name>CC</name><score>0</score></client></tour>
+<tour>
+<num_tour>3</num_tour>
+<client>
+<name>
+BB</name>
+<score>
+0</score>
+</client>
+</tour>
+</session>
+</journal>

@@ -49,6 +49,6 @@ typé dynamiquement d’autre part, nous avons pu développer l’esprit d’éq
 gestion de projets grâce à GitHub, le service web d’hébergement et de gestion de
 développement de logiciels.
 
-# Sorbonne Universités
-# Boggle_2018
-# Boggle_2018
+# Sorbonne Université
+
+
